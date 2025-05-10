@@ -50,7 +50,7 @@ jobs:
       - name: Check YC CLI and cluster access
         run: |
           yc --version
-          kubectl version --short
+          kubectl version --client
           kubectl cluster-info
 
       - name: Create or update Kubernetes secret for MLflow
