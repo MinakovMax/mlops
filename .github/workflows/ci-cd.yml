@@ -27,14 +27,19 @@ jobs:
         docker build -t $IMAGE ./app
         docker push $IMAGE
 
+        - name: Install Yandex Cloud CLI
+        run: |
+          curl https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash
+          echo "$HOME/yandex-cloud/bin" >> $GITHUB_PATH
+      
     - name: Set up Yandex CLI and kubeconfig
       run: |
-        echo "${{ secrets.YC_SA_KEY_JSON }}" > key.json
-        yc config set service-account-key key.json
-        yc config set cloud-id b1geqc3j25h2f34cha4p
-        yc config set folder-id b1gag8ikm3e5t7t73a71
-        yc container registry configure-docker
-        yc managed-kubernetes cluster get-credentials ${{ secrets.YC_K8S_CLUSTER_ID }} --zone ${{ secrets.YC_ZONE }} --external
+          echo "${{ secrets.YC_SA_KEY_JSON }}" > key.json
+          yc config set service-account-key key.json
+          yc config set cloud-id ${{ secrets.YC_CLOUD_ID }}
+          yc config set folder-id ${{ secrets.YC_FOLDER_ID }}
+          yc container registry configure-docker
+          yc managed-kubernetes cluster get-credentials ${{ secrets.YC_K8S_CLUSTER_ID }} --zone ${{ secrets.YC_ZONE }} --external
 
     - name: Create or update Kubernetes secret for MLflow
       run: |
