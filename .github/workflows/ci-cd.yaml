@@ -4,7 +4,6 @@ on:
   push:
     branches: [main]
 
-
 jobs:
   build-deploy:
     runs-on: ubuntu-latest
@@ -33,18 +32,11 @@ jobs:
         curl https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash
         echo "$HOME/yandex-cloud/bin" >> $GITHUB_PATH
 
-    - name: Decode and write Yandex SA key to file
-      run: echo "$YC_SA_KEY_JSON" | base64 -d > key.json
-      env:
-        YC_SA_KEY_JSON: ${{ secrets.YC_SA_KEY_JSON }}
-
-    - name: Set up Yandex CLI and kubeconfig
+    - name: Decode and write kubeconfig from secret
       run: |
-        yc config set service-account-key key.json
-        yc config set cloud-id ${{ secrets.YC_CLOUD_ID }}
-        yc config set folder-id ${{ secrets.YC_FOLDER_ID }}
-        yc container registry configure-docker
-        yc managed-kubernetes cluster get-credentials ${{ secrets.YC_K8S_CLUSTER_ID }} --zone ${{ secrets.YC_ZONE }} --external
+        mkdir -p $HOME/.kube
+        echo "${{ secrets.KUBECONFIG_YC }}" | base64 -d > $HOME/.kube/config
+        chmod 600 $HOME/.kube/config
 
     - name: Create or update Kubernetes secret for MLflow
       run: |
@@ -63,4 +55,3 @@ jobs:
         helm upgrade --install fastapi charts/fastapi \
           --set image.repository=ghcr.io/minakovmax/fastapi-app \
           --set image.tag=latest
-
