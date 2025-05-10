@@ -13,6 +13,7 @@ requests==2.31.*        # mlflow-skinny требует «<3»
 pandas==2.2.3
 numpy==2.2.5           # pandas_ta всё ещё ломается на NumPy ≥ 2 :contentReference[oaicite:1]{index=1}
 pandas_ta==0.3.14b0     # пропатчим ниже
+boto3
 
 # ─── прочее, что у вас было ────────────────────────────────
 mlflow-skinny       # НЕ пишем! mlflow сам подтянет ту же версию
