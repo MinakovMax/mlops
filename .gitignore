@@ -8,6 +8,7 @@ __pycache__/
 dist/
 build/
 venv/
+venv-fastapi/
 .env
 .env.*
 
@@ -31,6 +32,8 @@ venv/
 models/
 artifacts/
 mlops/
+catboost_info/
+
 
 # === Docker / CI ===
 *.tar
