@@ -1,6 +1,5 @@
 name: Train and Deploy ML model
 
-
 on:
   push:
     branches: [ main ]
@@ -43,17 +42,44 @@ jobs:
 
     - name: Train and log model
       run: |
-        set -e  # Остановит скрипт при любой ошибке
+        set -e
         echo "🧠 Запуск обучения модели..."
         python train.py
         echo "✅ Обучение завершено успешно"
 
-    - name: Build Docker image
+    - name: Set up YC CLI
       run: |
-        docker build -t ${{ secrets.DOCKER_USERNAME }}/mlflow-fastapi:latest .
+        echo "${{ secrets.YC_SA_KEY_BASE64 }}" | base64 -d > key.json
+        curl https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash
+        export PATH="$HOME/yandex-cloud/bin:$PATH"
+        yc config set service-account-key key.json
+        yc config set cloud-id ${{ secrets.YC_CLOUD_ID }}
+        yc config set folder-id ${{ secrets.YC_FOLDER_ID }}
 
-    - name: Login to Docker Hub
-      run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+    - name: Configure K8s access
+      run: |
+        export PATH="$HOME/yandex-cloud/bin:$PATH"
+        yc managed-kubernetes cluster get-credentials ${{ secrets.YC_K8S_CLUSTER_NAME }} --external --zone ${{ secrets.YC_ZONE }}
 
-    - name: Push Docker image
-      run: docker push ${{ secrets.DOCKER_USERNAME }}/mlflow-fastapi:latest
+    - name: Set up Helm
+      uses: azure/setup-helm@v3
+      with:
+        version: v3.13.3
+
+    - name: Deploy MLflow with Helm
+      run: |
+        helm repo add bitnami https://charts.bitnami.com/bitnami
+        helm repo update
+        helm upgrade --install mlflow bitnami/mlflow \
+          --namespace mlflow \
+          --create-namespace \
+          --set service.type=LoadBalancer \
+          --set image.tag=2.12.1 \
+          --set backendStore.database.type=postgresql \
+          --set artifactRoot=${{ secrets.ARTIFACT_ROOT }} \
+          --set backendStore.database.host=${{ secrets.POSTGRES_HOST }} \
+          --set backendStore.database.port=${{ secrets.POSTGRES_PORT }} \
+          --set backendStore.database.user=${{ secrets.POSTGRES_USER }} \
+          --set backendStore.database.password=${{ secrets.POSTGRES_PASSWORD }} \
+          --set backendStore.database.database=${{ secrets.POSTGRES_DB }}
+
