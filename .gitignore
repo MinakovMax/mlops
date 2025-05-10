@@ -1,0 +1,70 @@
+# === Python ===
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg
+*.egg-info/
+dist/
+build/
+venv/
+.env
+.env.*
+
+# === Jupyter / Notebooks ===
+.ipynb_checkpoints/
+
+# === ML / Data / Outputs ===
+*.log
+*.csv
+*.tsv
+*.parquet
+*.pkl
+*.joblib
+*.h5
+*.model
+*.onnx
+*.pt
+*.sav
+*.npy
+*.npz
+models/
+artifacts/
+mlops/
+
+# === Docker / CI ===
+*.tar
+*.log
+*.pid
+.dockerignore
+.docker-compose*
+
+# === Terraform ===
+.terraform/
+terraform.tfstate*
+*.tfvars
+*.tfstate.backup
+crash.log
+
+# === Kubernetes / Helm ===
+*.yaml~        # temp files
+*.tgz          # Helm charts
+*.release.yaml # output from helmfile
+.kube/
+.kubeconfig
+
+# === GitHub Actions secrets or tokens ===
+key.json
+yc-sa-key.json
+
+# === System ===
+.DS_Store
+Thumbs.db
+*.swp
+*.bak
+*.tmp
+
+# === VSCode / IDEs ===
+.vscode/
+.idea/
+*.code-workspace

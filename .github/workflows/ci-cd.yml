@@ -1,0 +1,53 @@
+name: Build & Push FastAPI
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build-push:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Log in to GitHub Container Registry
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+        registry: ghcr.io
+
+    - name: Build and Push Docker image
+      run: |
+        IMAGE=ghcr.io/${{ github.repository_owner }}/fastapi-app:latest
+        docker build -t $IMAGE ./app
+        docker push $IMAGE
+
+    - name: Set up Yandex CLI and kubeconfig
+      run: |
+        echo "${{ secrets.YC_SA_KEY_JSON }}" > key.json
+        yc config set service-account-key key.json
+        yc config set cloud-id b1geqc3j25h2f34cha4p
+        yc config set folder-id b1gag8ikm3e5t7t73a71
+        yc container registry configure-docker
+        yc managed-kubernetes cluster get-credentials ${{ secrets.YC_K8S_CLUSTER_ID }} --zone ${{ secrets.YC_ZONE }} --external
+
+    - name: Create or update Kubernetes secret for MLflow
+      run: |
+        kubectl create secret generic mlflow-secrets \
+          --from-literal=AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} \
+          --from-literal=AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} \
+          --dry-run=client -o yaml | kubectl apply -f -
+
+    - name: Install Helm
+      uses: azure/setup-helm@v3
+      with:
+        version: v3.13.3
+
+    - name: Deploy with Helm
+      run: |
+        helm upgrade --install fastapi charts/fastapi \
+          --set image.repository=ghcr.io/${{ github.repository_owner }}/fastapi-app \
+          --set image.tag=latest

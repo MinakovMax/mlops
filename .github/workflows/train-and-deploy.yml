@@ -1,0 +1,49 @@
+name: Train and Deploy ML model
+
+on:
+  push:
+    branches: [ main ]
+  schedule:
+    - cron: '0 8 * * 0'  # каждое воскресенье в 08:00 UTC = 11:00 МСК
+  workflow_dispatch:
+
+jobs:
+  train-and-deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      MLFLOW_S3_ENDPOINT_URL: ${{ secrets.MLFLOW_S3_ENDPOINT_URL }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      ARTIFACT_ROOT: ${{ secrets.ARTIFACT_ROOT }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.10
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Train and log model
+        run: |
+          set -e  # Остановит скрипт при любой ошибке
+          echo "🧠 Запуск обучения модели..."
+          python train.py
+          echo "✅ Обучение завершено успешно"
+          
+      - name: Build Docker image
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/mlflow-fastapi:latest .
+
+      - name: Login to Docker Hub
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+      - name: Push Docker image
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/mlflow-fastapi:latest

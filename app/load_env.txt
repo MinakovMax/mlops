@@ -1,0 +1,4 @@
+export $(cat infra/.env | xargs)
+uvicorn app.main:app --reload
+source venv-fastapi/bin/activate
+source mlops/bin/activate

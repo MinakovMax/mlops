@@ -1,0 +1,12 @@
+- direction: ingress
+  protocol: tcp
+  port:
+    from: 5000
+    to: 5000
+  predefined_target: all
+  description: "Allow MLFlow UI"
+
+- direction: egress
+  protocol: any
+  predefined_target: all
+  description: "Allow all outbound"

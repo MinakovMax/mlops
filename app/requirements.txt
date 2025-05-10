@@ -1,0 +1,18 @@
+# ─── ядро ML ────────────────────────────────────────────────
+xgboost==3.0.0          # колёсико уже есть на PyPI (manylinux)
+lightgbm==4.6.0         # то же
+catboost==1.2.8         # поддерживает NumPy 2.x :contentReference[oaicite:0]{index=0}
+scikit-learn==1.6.1
+fastapi==0.115.12
+uvicorn==0.34.2
+
+# ─── служебные пакеты ───────────────────────────────────────
+mlflow==2.22.0          # 2.22.0 пока конфликтует с зависимостями
+python-dotenv==1.1.0
+requests==2.31.*        # mlflow-skinny требует «<3»
+pandas==2.2.3
+numpy==2.2.5           # pandas_ta всё ещё ломается на NumPy ≥ 2 :contentReference[oaicite:1]{index=1}
+pandas_ta==0.3.14b0     # пропатчим ниже
+
+# ─── прочее, что у вас было ────────────────────────────────
+mlflow-skinny       # НЕ пишем! mlflow сам подтянет ту же версию

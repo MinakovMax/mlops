@@ -1,0 +1,6 @@
+apiVersion: v2
+name: mlflow
+description: MLFlow Tracking Server
+type: application
+version: 0.1.0
+appVersion: "2.11.3"
