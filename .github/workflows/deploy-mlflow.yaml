@@ -7,6 +7,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     env:      
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       PG_PASSWORD_URL_ENCODED: ${{ secrets.PG_PASSWORD_URL_ENCODED }}
@@ -28,7 +29,7 @@ jobs:
     - name: Configure kubeconfig
       run: |
         echo "${{ secrets.KUBECONFIG }}" > kubeconfig
-        export KUBECONFIG=$PWD/kubeconfig
+        echo "KUBECONFIG=$PWD/kubeconfig" >> $GITHUB_ENV
 
     - name: Export env and render values.yaml
       shell: bash
