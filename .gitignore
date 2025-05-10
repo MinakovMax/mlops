@@ -9,6 +9,7 @@ dist/
 build/
 venv/
 venv-fastapi/
+app/venv-fastapi/
 .env
 .env.*
 
