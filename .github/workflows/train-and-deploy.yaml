@@ -62,6 +62,7 @@ jobs:
         run: |
           mkdir -p $HOME/.kube
           echo "${{ secrets.KUBECONFIG_YC_64 }}" | base64 -d > $HOME/.kube/config
+          sed -i "s|/home/.*/yandex-cloud/bin/yc|${HOME}/yandex-cloud/bin/yc|g" $HOME/.kube/config
           chmod 600 $HOME/.kube/config
 
       - name: Set up Helm
