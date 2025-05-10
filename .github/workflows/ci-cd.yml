@@ -21,7 +21,7 @@ jobs:
 
     - name: Build and Push Docker image
       run: |
-        IMAGE=ghcr.io/${{ github.repository_owner }}/fastapi-app:latest
+        IMAGE=ghcr.io/minakovmax/fastapi-app:latest
         docker build -t $IMAGE ./app
         docker push $IMAGE
 
