@@ -13,7 +13,7 @@ import os
 from dotenv import load_dotenv
 
 # Загрузить переменные из файла .env
-load_dotenv(dotenv_path="infra/.env", override=True)
+# load_dotenv(dotenv_path="infra/.env", override=True)
    
     
 def load_and_prepare_data():
