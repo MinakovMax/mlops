@@ -3,7 +3,7 @@ name: Build & Deploy FastAPI
 on:
   push:
     branches: [main]
-    
+
 
 jobs:
   build-deploy:
@@ -34,9 +34,9 @@ jobs:
         echo "$HOME/yandex-cloud/bin" >> $GITHUB_PATH
 
     - name: Decode and write Yandex SA key to file
-      run: echo "$YC_SA_KEY_B64" | base64 -d > key.json
+      run: echo "$YC_SA_KEY_JSON" | base64 -d > key.json
       env:
-        YC_SA_KEY_B64: ${{ secrets.YC_SA_KEY_B64 }}
+        YC_SA_KEY_JSON: ${{ secrets.YC_SA_KEY_JSON }}
 
     - name: Set up Yandex CLI and kubeconfig
       run: |
