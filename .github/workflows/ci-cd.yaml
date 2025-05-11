@@ -27,14 +27,11 @@ jobs:
           docker build -t $IMAGE ./app
           docker push $IMAGE
 
-      - name: Install Yandex Cloud CLI
-        run: |
-          curl -sSL https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash
-          echo "${HOME}/yandex-cloud/bin" >> $GITHUB_PATH
-
-      - name: Configure YC CLI with profile
+      - name: Set up YC CLI with profile
         run: |
           echo "${{ secrets.YC_SA_KEY_JSON }}" | base64 -d > key.json
+          curl -sSL https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash
+          echo "${HOME}/yandex-cloud/bin" >> $GITHUB_PATH
           export PATH="${HOME}/yandex-cloud/bin:$PATH"
           yc config profile create ml-ops-lab
           yc config profile activate ml-ops-lab
@@ -42,12 +39,13 @@ jobs:
           yc config set cloud-id ${{ secrets.YC_CLOUD_ID }}
           yc config set folder-id ${{ secrets.YC_FOLDER_ID }}
           yc config list
-          yc --version
+          yc version
 
-      - name: Decode and write kubeconfig from secret
+      - name: Set up kubeconfig
         run: |
           mkdir -p $HOME/.kube
           echo "${{ secrets.KUBECONFIG_YC_64 }}" | base64 -d > $HOME/.kube/config
+          sed -i "s|/home/.*/yandex-cloud/bin/yc|${HOME}/yandex-cloud/bin/yc|g" $HOME/.kube/config
           chmod 600 $HOME/.kube/config
 
       - name: Check YC CLI and cluster access
