@@ -3,7 +3,9 @@ replicaCount: 1
 image:
   repository: ghcr.io/minakovmax/fastapi-app
   tag: latest
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
+  pullSecrets:
+    - name: ghcr-auth
 
 service:
   type: ClusterIP
