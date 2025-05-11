@@ -1,5 +1,7 @@
 replicaCount: 1
 
+containerPort: 9090
+
 image:
   repository: ghcr.io/minakovmax/fastapi-app
   tag: latest
@@ -8,8 +10,10 @@ image:
     - name: ghcr-auth
 
 service:
-  type: ClusterIP
-  port: 8080
+  type: NodePort
+  port: 80
+  targetPort: 9090
+  nodePort: 31090 # новый NodePort
 
 env:
   - name: MLFLOW_S3_ENDPOINT_URL

@@ -7,5 +7,7 @@ spec:
   selector:
     app: {{ .Chart.Name }}
   ports:
-    - port: {{ .Values.service.port }}
-      targetPort: 8080
+    - name: http
+      port: {{ .Values.service.port }}
+      targetPort: {{ .Values.service.targetPort }}
+      nodePort: {{ .Values.service.nodePort }}
