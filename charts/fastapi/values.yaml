@@ -9,7 +9,7 @@ image:
 
 service:
   type: ClusterIP
-  port: 8000
+  port: 8080
 
 env:
   - name: MLFLOW_S3_ENDPOINT_URL
