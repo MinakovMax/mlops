@@ -80,4 +80,5 @@ jobs:
           helm upgrade --install fastapi charts/fastapi \
             --set image.repository=ghcr.io/minakovmax/fastapi-app \
             --set image.tag=latest \
+            --set image.pullPolicy=Always \
             --set image.pullSecrets[0].name=ghcr-auth
