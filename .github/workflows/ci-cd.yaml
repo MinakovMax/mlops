@@ -61,6 +61,15 @@ jobs:
             --from-literal=AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} \
             --dry-run=client -o yaml | kubectl apply -f -
 
+      - name: Create or update Kubernetes secret for GHCR auth
+        run: |
+          kubectl create secret docker-registry ghcr-auth \
+            --docker-server=ghcr.io \
+            --docker-username=${{ secrets.DOCKER_USERNAME }} \
+            --docker-password=${{ secrets.DOCKER_PASSWORD }} \
+            --docker-email=dummy@example.com \
+            --dry-run=client -o yaml | kubectl apply -f -
+
       - name: Install Helm
         uses: azure/setup-helm@v3
         with:
@@ -70,4 +79,5 @@ jobs:
         run: |
           helm upgrade --install fastapi charts/fastapi \
             --set image.repository=ghcr.io/minakovmax/fastapi-app \
-            --set image.tag=latest
+            --set image.tag=latest \
+            --set image.pullSecrets[0].name=ghcr-auth
