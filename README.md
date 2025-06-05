@@ -52,5 +52,7 @@
 
 > **Студент:** Минаков Максим Михайлович  
 > **Научный руководитель:** Крылов Сергей Сергеевич, МАИ, кафедра 806
+
 > **Текст ВКР:** https://docs.google.com/document/d/19Sso60_9_xlu5YiysuScDPgr60rx01Uu/edit
+
 > **Презентация:** https://docs.google.com/presentation/d/1OpCmgUhPoV6r2Xgxu69-pcxkHeqbsIY7auYWuEYRMJc/edit?slide=id.g2954c97530a_0_0#slide=id.g2954c97530a_0_0
