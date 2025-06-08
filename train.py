@@ -104,70 +104,18 @@ df['target_mapped'] = df['target'].map(mapping_dict)
 
 # 📊 Дополнительные признаки тренда и силы рынка
 
-# 🔹 Разница между краткосрочной и долгосрочной EMA
 df['ema_diff'] = df['EMA_15'] - df['EMA_75']  
-# ➝ Разница между 15-периодной и 75-периодной экспоненциальной скользящей средней (EMA).
-# ➝ Если значение положительное, краткосрочный тренд выше долгосрочного (возможный рост).
-# ➝ Если значение отрицательное, краткосрочный тренд ниже долгосрочного (возможное падение).
-
-# 🔹 Флаг: EMA_15 выше EMA_75 (бычий сигнал)
 df['ema_15_gt_ema_75'] = (df['EMA_15'] > df['EMA_75']).astype(int)
-# ➝ Если EMA_15 выше EMA_75, устанавливаем 1 (сигнал на возможное продолжение роста).
-# ➝ Если EMA_15 ниже EMA_75, устанавливаем 0 (возможный нисходящий тренд).
-
-# 🔹 Флаг: RSI пересекает 70 вверх (перекупленность)
 df["rsi_above_70"] = (df["RSI_14"] > 70).astype(int)
-# ➝ Если RSI выше 70, актив считается перекупленным → возможен откат вниз.
-# ➝ Используется как сигнал для фиксации прибыли.
-
-# 🔹 Флаг: RSI пересекает 80 вверх (сильная перекупленность)
 df["rsi_above_80"] = (df["RSI_14"] > 80).astype(int)
-# ➝ Если RSI выше 80, актив **сильно** перекуплен → высокая вероятность коррекции вниз.
-# ➝ Используется как сильный сигнал на фиксацию прибыли.
-
-# 🔹 Флаг: RSI пересекает 20 вниз (перепроданность)
 df['rsi_below_20'] = (df['RSI_14'] < 20).astype(int)
-# ➝ Если RSI ниже 20, актив **перепродан** → возможен отскок вверх.
-# ➝ Используется как сигнал для входа в длинные позиции (покупку).
-
-# 🔹 Флаг: RSI пересекает 30 вниз (слабая перепроданность)
 df['rsi_below_30'] = (df['RSI_14'] < 30).astype(int)
-# ➝ Если RSI ниже 30, актив **находится в зоне перепроданности**.
-# ➝ Возможен разворот вверх, но сигнал слабее, чем при RSI < 20.
-
-# 📊 Определение силы тренда с помощью ADX
-
-# 🔹 Флаг: Сильный тренд (ADX > 25)
 df["adx_strong_trend"] = (df["ADX"] > 25).astype(int)
-# ➝ Если ADX выше 25, тренд считается сильным.
-# ➝ В таком случае DI+ и DI- подскажут направление тренда.
-
-# 🔹 Флаг: Слабый тренд (ADX < 20) или флэт
 df["adx_weak_trend"] = (df["ADX"] < 20).astype(int)
-# ➝ Если ADX ниже 20, тренд слабый или рынок находится во флэте.
-# ➝ В таких условиях индикаторы тренда (DI+ и DI-) менее надежны.
-
-# 📊 Направление тренда на основе DI+ и DI-
-
-# 🔹 Флаг: Восходящий тренд (DI+ > DI-)
 df["di_up_trend"] = (df["DI+"] > df["DI-"]).astype(int)
-# ➝ Если DI+ выше DI-, актив в восходящем тренде.
-
-# 🔹 Флаг: Нисходящий тренд (DI- > DI+)
 df["di_down_trend"] = (df["DI-"] > df["DI+"]).astype(int)
-# ➝ Если DI- выше DI+, актив в нисходящем тренде.
-
-# 📊 Комбинированные признаки силы тренда
-
-# 🔹 Флаг: Сильный восходящий тренд (ADX > 25 и DI+ > DI-)
 df["strong_up_trend"] = ((df["ADX"] > 25) & (df["DI+"] > df["DI-"])).astype(int)
-# ➝ Если ADX выше 25 и DI+ выше DI-, тренд сильный и восходящий.
-# ➝ Это **подтвержденный бычий сигнал**.
-
-# 🔹 Флаг: Сильный нисходящий тренд (ADX > 25 и DI- > DI+)
 df["strong_down_trend"] = ((df["ADX"] > 25) & (df["DI-"] > df["DI+"])).astype(int)
-# ➝ Если ADX выше 25 и DI- выше DI+, тренд сильный и нисходящий.
-# ➝ Это **подтвержденный медвежий сигнал**.
 
 ohlcv = ['Open', 'High', 'Low', 'Close', 'Volume']
 futr_exog_cols = ['EMA_15', 'EMA_75', 'ADX', 'DI+', 'DI-', 'RSI_14', 'ATR_14']
@@ -239,35 +187,16 @@ y = df["target_mapped"]
 
 # === Модели ===
 models = {
-    "XGB": XGBClassifier(
-        objective="multi:softmax",
-        max_depth=3,
-        n_estimators=408,
-        subsample=0.754,
-        colsample_bytree=0.602,
-        num_class=3,
-        eval_metric="mlogloss",
-        random_state=42,
-        use_label_encoder=False,
+    "XGB": XGBClassifier(objective="multi:softmax", max_depth=3,n_estimators=408,
+        subsample=0.754, colsample_bytree=0.602, num_class=3, eval_metric="mlogloss",
+        random_state=42, use_label_encoder=False,
     ),
-    "LGBM": LGBMClassifier(
-        objective="multiclass",
-        max_depth=3,
-        n_estimators=928,
-        subsample=0.724,
-        colsample_bytree=0.658,
-        num_class=3,
-        random_state=42,
+    "LGBM": LGBMClassifier(objective="multiclass", max_depth=3, n_estimators=928,
+        subsample=0.724, colsample_bytree=0.658, num_class=3, random_state=42,
     ),
-    "CatBoost": CatBoostClassifier(
-        loss_function="MultiClass",
-        random_seed=42,
-        iterations=1000,
-        learning_rate=0.05,
-        early_stopping_rounds=100,
-        use_best_model=True,
-        verbose=0,
-    ),
+    "CatBoost": CatBoostClassifier(loss_function="MultiClass", random_seed=42,
+        iterations=1000, learning_rate=0.05, early_stopping_rounds=100,
+        use_best_model=True, verbose=0,),
 }
 
 selected_models = list(models.keys())
@@ -295,12 +224,9 @@ with mlflow.start_run(run_name="last_5000"):
             mlflow.log_metric("recall_macro", recall_score(y, y_pred, average="macro"))
 
             # Логирование модели
-            if name == "XGB":
-                mlflow.xgboost.log_model(model, artifact_path="model", registered_model_name="XGBoostModel")
-            elif name == "LGBM":
-                mlflow.lightgbm.log_model(model, artifact_path="model", registered_model_name="LightGBMModel")
-            elif name == "CatBoost":
-                mlflow.catboost.log_model(model, artifact_path="model", registered_model_name="CatBoostModel")
+            if name == "XGB": mlflow.xgboost.log_model(model, artifact_path="model", registered_model_name="XGBoostModel")
+            elif name == "LGBM": mlflow.lightgbm.log_model(model, artifact_path="model", registered_model_name="LightGBMModel")
+            elif name == "CatBoost": mlflow.catboost.log_model(model, artifact_path="model", registered_model_name="CatBoostModel")
 
     # === Ансамбль ===
     final_preds = []
@@ -316,8 +242,7 @@ with mlflow.start_run(run_name="last_5000"):
     f1 = f1_score(y, final_preds, average="macro")
     prec = precision_score(y, final_preds, average="macro")
     rec = recall_score(y, final_preds, average="macro")
-    correct_frac = (np.sum((np.array(final_preds) == 0) & (y.values == 0)) +
-                    np.sum((np.array(final_preds) == 2) & (y.values == 2))) / len(y)
+    correct_frac = (np.sum((np.array(final_preds) == 0) & (y.values == 0)) + np.sum((np.array(final_preds) == 2) & (y.values == 2))) / len(y)
 
     mlflow.log_metric("ensemble_accuracy", acc)
     mlflow.log_metric("ensemble_f1_macro", f1)
@@ -325,11 +250,7 @@ with mlflow.start_run(run_name="last_5000"):
     mlflow.log_metric("ensemble_recall_macro", rec)
     mlflow.log_metric("ensemble_correct_frac_0_2", correct_frac)
 
-    df_preds = pd.DataFrame({
-        "index": X.index,
-        "true": y.values,
-        "ensemble_pred": final_preds
-    })
+    df_preds = pd.DataFrame({"index": X.index, "true": y.values,"ensemble_pred": final_preds})
     pred_path = "ensemble_last_5000_predictions.csv"
     df_preds.to_csv(pred_path, index=False)
     mlflow.log_artifact(pred_path, artifact_path="ensemble_preds")

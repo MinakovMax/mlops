@@ -1,16 +1,27 @@
 replicaCount: 1
 
 image:
-  repository: bitnami/mlflow
-  tag: "2.10.1-debian-11-r0"
+  repository: ghcr.io/mlflow/mlflow
+  tag: v2.22.1 # или конкретная версия (например, v2.9.2)
+  pullPolicy: IfNotPresent
 
 service:
   type: LoadBalancer
   port: 8080
 
-env:
-  backendStoreUri: "postgresql://mlflow:${PG_PASSWORD_URL_ENCODED}@${PG_HOST}:6432/mlflow"
-  artifactRoot: "s3://${BUCKET_NAME}/artifacts"
-  s3EndpointUrl: "https://storage.yandexcloud.net"
-  useSecret: true
-  secretName: mlflow-s3-credentials
+backendStore:
+  uri: "postgresql://mlflow:${PG_PASSWORD_URL_ENCODED}@${PG_HOST}:6432/mlflow?sslmode=require"
+
+artifactRoot: "s3://${BUCKET_NAME}/artifacts"
+
+s3:
+  endpointUrl: "https://storage.yandexcloud.net"
+  secret: mlflow-s3-credentials
+  secretKeyRef:
+    AWS_ACCESS_KEY_ID: AWS_ACCESS_KEY_ID
+    AWS_SECRET_ACCESS_KEY: AWS_SECRET_ACCESS_KEY
+
+# Для совместимости с Yandex S3
+extraEnv:
+  - name: MLFLOW_S3_USE_VIRTUAL_HOST
+    value: "true"
