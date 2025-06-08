@@ -31,8 +31,6 @@ artifactRoot:
   s3:
     enabled: true
     bucket: "${BUCKET_NAME}"
-    # Если нужен путь внутри бакета:
-    # path: "artifacts"
     awsAccessKeyId: "${AWS_ACCESS_KEY_ID}"
     awsSecretAccessKey: "${AWS_SECRET_ACCESS_KEY}"
     # endpointUrl параметр не поддерживается напрямую, но можно задать через переменные окружения
