@@ -71,4 +71,4 @@ Thumbs.db
 # === VSCode / IDEs ===
 .vscode/
 .idea/
-*.code-workspace
+*.code-workspacecharts/mlflow/values.yaml
