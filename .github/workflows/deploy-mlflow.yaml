@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     env:      
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      PG_PASSWORD_URL_ENCODED: ${{ secrets.PG_PASSWORD_URL_ENCODED }}
+      PG_PASSWORD: ${{ secrets.PG_PASSWORD }}
       PG_HOST: ${{ secrets.PG_HOST }}
       BUCKET_NAME: ${{ secrets.BUCKET_NAME }}
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
