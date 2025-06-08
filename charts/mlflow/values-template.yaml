@@ -9,6 +9,9 @@ service:
   type: LoadBalancer
   port: 8080
 
+postgresql:
+  enabled: false
+
 # Настройка backendStore для PostgreSQL
 backendStore:
   postgres:
