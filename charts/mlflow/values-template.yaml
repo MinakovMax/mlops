@@ -23,7 +23,7 @@ backendStore:
     port: 6432
     database: mlflow
     user: mlflow
-    password: ${PG_PASSWORD_URL_ENCODED}
+    password: ${PG_PASSWORD}
     driver: "psycopg2"
 
 # Настройка artifactRoot для S3-хранилища
