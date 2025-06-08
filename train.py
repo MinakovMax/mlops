@@ -167,7 +167,7 @@ import mlflow
 import mlflow.sklearn
 
 # === Настройка MLflow ===
-mlflow.set_tracking_uri("http://158.160.134.123:8080")
+mlflow.set_tracking_uri("http://158.160.179.163:8080")
 mlflow.set_experiment("ensemble_latest_5000")
 
 # Вычисление будущей доходности
