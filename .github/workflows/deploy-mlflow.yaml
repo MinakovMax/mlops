@@ -68,6 +68,7 @@ jobs:
     - name: Clean up old mlflow pods
       shell: bash
       run: |
+        set +e
         kubectl get pods | grep mlflow | grep -E 'Completed|Error|CrashLoopBackOff' | awk '{print $1}' | xargs -r kubectl delete pod
 
     - name: Helm upgrade MLflow
