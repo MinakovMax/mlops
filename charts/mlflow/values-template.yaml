@@ -5,6 +5,9 @@ image:
   tag: v2.22.1
   pullPolicy: IfNotPresent
 
+imagePullSecrets:
+  - name: ghcr-secret
+
 service:
   type: LoadBalancer
   port: 8080
