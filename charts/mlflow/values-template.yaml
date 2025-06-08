@@ -1,7 +1,7 @@
 replicaCount: 1
 
 image:
-  repository: ghcr.io/mlflow/mlflow
+  repository: ghcr.io/minakovmax/mlflow
   tag: v2.22.1
   pullPolicy: IfNotPresent
 
