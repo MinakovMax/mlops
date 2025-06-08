@@ -30,11 +30,13 @@ jobs:
       uses: azure/setup-helm@v3
       
     - name: Configure kubeconfig
+      shell: bash
       run: |
         echo "${{ secrets.KUBECONFIG }}" > kubeconfig
         echo "KUBECONFIG=$PWD/kubeconfig" >> $GITHUB_ENV
 
     - name: Create Docker Registry Secret in Kubernetes
+      shell: bash
       run: |
         kubectl create secret docker-registry ghcr-secret \
           --docker-server=ghcr.io \
@@ -42,13 +44,14 @@ jobs:
           --docker-password="${DOCKER_PASSWORD}" \
           --docker-email=minakovmax86@gmail.com \
           --dry-run=client -o yaml | kubectl apply -f -
-      # Если меняешь имя секрета — поменяй и в деплойменте!
+      # Если меняешь имя секрета — поменяй и в values.yaml!
 
     - name: Create S3 credentials secret
+      shell: bash
       run: |
         kubectl create secret generic mlflow-s3-credentials \
-          --from-literal=AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} \
-          --from-literal=AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY} \
+          --from-literal=AWS_ACCESS_KEY_ID="${AWS_ACCESS_KEY_ID}" \
+          --from-literal=AWS_SECRET_ACCESS_KEY="${AWS_SECRET_ACCESS_KEY}" \
           --dry-run=client -o yaml | kubectl apply -f -
     
     - name: Export env and render values.yaml
@@ -62,11 +65,16 @@ jobs:
         envsubst < charts/mlflow/values-template.yaml > charts/mlflow/values.yaml
         cat charts/mlflow/values.yaml  # Для отладки
         
+    - name: Clean up old mlflow pods
+      shell: bash
+      run: |
+        kubectl get pods | grep mlflow | grep -E 'Completed|Error|CrashLoopBackOff' | awk '{print $1}' | xargs -r kubectl delete pod
+
     - name: Helm upgrade MLflow
+      shell: bash
       run: |
         helm repo add community-charts https://community-charts.github.io/helm-charts
         helm repo update
         helm upgrade --install mlflow-release community-charts/mlflow \
           -f charts/mlflow/values.yaml \
           --wait --timeout 10m0s
-
