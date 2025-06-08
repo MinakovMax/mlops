@@ -2,7 +2,7 @@ replicaCount: 1
 
 image:
   repository: ghcr.io/mlflow/mlflow
-  tag: v2.22.1 # или конкретная версия (например, v2.9.2)
+  tag: v2.22.1
   pullPolicy: IfNotPresent
 
 service:
@@ -10,17 +10,28 @@ service:
   port: 8080
 
 backendStore:
-  uri: "postgresql://mlflow:${PG_PASSWORD_URL_ENCODED}@${PG_HOST}:6432/mlflow?sslmode=require"
+  database:
+    type: postgresql
+    host: ${PG_HOST}
+    port: 6432
+    database: mlflow
+    user: mlflow
+    password: ${PG_PASSWORD_URL_ENCODED}
+    sslmode: require
 
-artifactRoot: "s3://${BUCKET_NAME}/artifacts"
+artifactRoot:
+  type: s3
+  path: "s3://${BUCKET_NAME}/artifacts"
 
-s3:
-  endpointUrl: "https://storage.yandexcloud.net"
-  secret: mlflow-s3-credentials
-  secretKeyRef:
-    AWS_ACCESS_KEY_ID: AWS_ACCESS_KEY_ID
-    AWS_SECRET_ACCESS_KEY: AWS_SECRET_ACCESS_KEY
+minio:
+  enabled: false
 
-extraEnv:
-  - name: MLFLOW_S3_USE_VIRTUAL_HOST
-    value: "true"
+externalS3:
+  enabled: true
+  bucket: "${BUCKET_NAME}"
+  endpoint: "https://storage.yandexcloud.net"
+  secretName: mlflow-s3-credentials
+  accessKeyField: AWS_ACCESS_KEY_ID
+  secretKeyField: AWS_SECRET_ACCESS_KEY
+  region: "ru-central1"
+  useVirtualHost: true
