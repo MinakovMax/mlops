@@ -57,7 +57,7 @@ jobs:
     - name: Export env and render values.yaml
       shell: bash
       run: |
-        export PG_PASSWORD_URL_ENCODED
+        export PG_PASSWORD
         export PG_HOST
         export BUCKET_NAME
         export AWS_ACCESS_KEY_ID
