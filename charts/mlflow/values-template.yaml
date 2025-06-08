@@ -21,7 +21,6 @@ s3:
     AWS_ACCESS_KEY_ID: AWS_ACCESS_KEY_ID
     AWS_SECRET_ACCESS_KEY: AWS_SECRET_ACCESS_KEY
 
-# Для совместимости с Yandex S3
 extraEnv:
   - name: MLFLOW_S3_USE_VIRTUAL_HOST
     value: "true"

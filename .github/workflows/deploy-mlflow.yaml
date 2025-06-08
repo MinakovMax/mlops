@@ -1,7 +1,10 @@
 name: Deploy MLflow to Kubernetes
+
 on:
   push:
     branches: [main]
+  workflow_dispatch: # Добавлено для ручного запуска через UI
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -26,8 +29,17 @@ jobs:
       run: |
         echo "${{ secrets.KUBECONFIG }}" > kubeconfig
         echo "KUBECONFIG=$PWD/kubeconfig" >> $GITHUB_ENV
-        
-    # Создание секретов
+
+    - name: Create Docker Registry Secret in Kubernetes
+      run: |
+        kubectl create secret docker-registry ghcr-secret \
+          --docker-server=ghcr.io \
+          --docker-username="${{ secrets.DOCKER_USERNAME }}" \
+          --docker-password="${{ secrets.DOCKER_PASSNORD }}" \
+          --docker-email=minakovmax86@gmail.com \
+          --dry-run=client -o yaml | kubectl apply -f -
+      # Если меняешь имя секрета — поменяй и в деплойменте!
+
     - name: Create S3 credentials secret
       run: |
         kubectl create secret generic mlflow-s3-credentials \
@@ -35,15 +47,6 @@ jobs:
           --from-literal=AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} \
           --dry-run=client -o yaml | kubectl apply -f -
     
-    - name: Create Docker registry secret
-      run: |
-        kubectl create secret docker-registry ghcr-secret \
-          --docker-server=ghcr.io \
-          --docker-username=${{ secrets.GH_USERNAME }} \
-          --docker-password=${{ secrets.CR_PAT }} \
-          --dry-run=client -o yaml | kubectl apply -f -
-    
-    # Генерация values.yaml
     - name: Export env and render values.yaml
       shell: bash
       run: |
@@ -51,10 +54,12 @@ jobs:
         export PG_HOST
         export BUCKET_NAME
         envsubst < charts/mlflow/values-template.yaml > charts/mlflow/values.yaml
+        cat charts/mlflow/values.yaml  # Для отладки
         
-    # Обновление Helm-репозитория и установка
     - name: Helm upgrade MLflow
       run: |
         helm repo add community-charts https://community-charts.github.io/helm-charts
         helm repo update
-        helm upgrade --install mlflow-release community-charts/mlflow -f charts/mlflow/values.yaml
+        helm upgrade --install mlflow-release community-charts/mlflow \
+          -f charts/mlflow/values.yaml \
+          --atomic --wait --timeout 5m0s
