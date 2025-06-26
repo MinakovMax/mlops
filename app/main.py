@@ -26,7 +26,7 @@ if os.getenv("AWS_SECRET_ACCESS_KEY"):
 if os.getenv("MLFLOW_S3_ENDPOINT_URL"):
     os.environ["MLFLOW_S3_ENDPOINT_URL"] = os.getenv("MLFLOW_S3_ENDPOINT_URL")
 
-mlflow.set_tracking_uri("http://158.160.134.123:8080")
+mlflow.set_tracking_uri("http://158.160.179.163:8080")
 app = FastAPI()
 
 # Загрузка моделей при старте
